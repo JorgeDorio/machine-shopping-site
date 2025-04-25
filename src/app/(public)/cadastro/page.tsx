@@ -24,7 +24,7 @@ export default function Register() {
     mutationFn: createUser,
     onSuccess: () => {
       toast("Usuário cadastrado com sucesso");
-      router.push("/acesso");
+      router.push("/");
     },
   });
 
