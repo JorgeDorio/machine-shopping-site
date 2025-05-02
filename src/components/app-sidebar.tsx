@@ -3,6 +3,7 @@ import {
   Home,
   Inbox,
   LogIn,
+  LogOut,
   Megaphone,
   MessagesSquare,
   Search,
@@ -11,7 +12,6 @@ import {
   Tractor,
   User,
 } from "lucide-react";
-
 import {
   Sidebar,
   SidebarContent,
@@ -24,8 +24,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "./theme-changer";
+import Cookies from "js-cookie";
 
-// Menu items.
 const items = [
   {
     title: "Início",
@@ -57,14 +57,11 @@ const items = [
     url: "#",
     icon: MessagesSquare,
   },
-  {
-    title: "Acessar / Cadastrar",
-    url: "acesso",
-    icon: LogIn,
-  },
 ];
 
 export function AppSidebar() {
+  const token = Cookies.get("token");
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -82,6 +79,28 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {!token ? (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <a href="acesso">
+                      <LogIn />
+                      <span>Acessar / Cadastrar</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ) : (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    onClick={() => Cookies.remove("token")}
+                  >
+                    <a href="/">
+                      <LogOut />
+                      <span>Sair</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

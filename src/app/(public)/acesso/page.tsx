@@ -16,16 +16,18 @@ import { LoginFormValues, loginSchema } from "./login-schema";
 import { useMutation } from "@tanstack/react-query";
 import { loginUser } from "@/services/user-service";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Login() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const login = useMutation({
     mutationFn: loginUser,
     onSuccess: () => {
       toast("Usuário autenticado com sucesso");
-      router.push("/");
+      const redirectTo = searchParams.get("redirectTo") || "/";
+      router.push(redirectTo || "/");
     },
   });
 

@@ -41,27 +41,29 @@ export const isValidToken = async (): Promise<boolean> => {
 
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
-  const route = publicRoutes.find((x) => x.path === path);
-  const token = req.cookies.get("token")?.value;
+  const publicRoute = publicRoutes.find((x) => x.path === path);
   const isAuthenticated = await isValidToken();
 
-  if (!isAuthenticated && route) return NextResponse.next();
+  if (!isAuthenticated && publicRoute) return NextResponse.next();
 
-  if (!isAuthenticated && !route) {
-    const response = NextResponse.redirect(
-      new URL(REDIRECT_TO_WHEN_NOT_AUTHENTICATED, req.url)
+  if (!isAuthenticated && !publicRoute) {
+    const redirectUrl = new URL(REDIRECT_TO_WHEN_NOT_AUTHENTICATED, req.url);
+    redirectUrl.searchParams.set(
+      "redirectTo",
+      req.nextUrl.pathname + req.nextUrl.search
     );
+    const response = NextResponse.redirect(redirectUrl);
     response.cookies.delete("token");
     return response;
   }
 
-  if (isAuthenticated && route?.whenAuthenticated === "redirect") {
+  if (isAuthenticated && publicRoute?.whenAuthenticated === "redirect") {
     const url = req.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
   }
 
-  if (isAuthenticated && !route) {
+  if (isAuthenticated && !publicRoute) {
     return NextResponse.next();
   }
 }
