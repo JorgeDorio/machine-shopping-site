@@ -1,8 +1,5 @@
 "use client";
-import React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+
 import {
   Form,
   FormControl,
@@ -11,14 +8,30 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { RegisterFormValues, loginSchema } from "./register-schema";
 import { useMutation } from "@tanstack/react-query";
-import { createUser } from "@/services/user-service";
+import { createUser, loginUser } from "@/services/user-service";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function Register() {
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { RegisterFormValues, registerSchema } from "./register-schema";
+
+interface IRegisterCardProps {
+  onTabChange: (value: string) => void;
+}
+
+export function RegisterCard({ onTabChange }: IRegisterCardProps) {
   const router = useRouter();
   const create = useMutation({
     mutationFn: createUser,
@@ -29,7 +42,7 @@ export default function Register() {
   });
 
   const form = useForm<RegisterFormValues>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -39,9 +52,14 @@ export default function Register() {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="p-8 rounded shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Cadastro</h1>
+    <Card>
+      <CardHeader>
+        <CardTitle>Cadastro</CardTitle>
+        <CardDescription>
+          Cadastre-se para ter acesso ao sistema.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-2">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit((user) => create.mutate(user))}
@@ -99,15 +117,19 @@ export default function Register() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
-              Cadastrar
-            </Button>
-            <div className="flex justify-center">
-              <a href="/acesso">Já tem uma conta? Clique aqui</a>
-            </div>
           </form>
         </Form>
-      </div>
-    </div>
+      </CardContent>
+      <CardFooter className="flex flex-col gap-2">
+        <Button type="submit" className="w-full">
+          Cadastrar
+        </Button>
+        <div className="flex justify-center cursor-pointer">
+          <a onClick={() => onTabChange("login")}>
+            Já tem uma conta? Clique aqui
+          </a>
+        </div>
+      </CardFooter>
+    </Card>
   );
 }

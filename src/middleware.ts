@@ -5,7 +5,6 @@ import { MiddlewareConfig, NextRequest, NextResponse } from "next/server";
 const publicRoutes = [
   { path: "/acesso", whenAuthenticated: "redirect" },
   { path: "/cadastro", whenAuthenticated: "redirect" },
-  { path: "/", whenAuthenticated: "next" },
 ] as const;
 
 const REDIRECT_TO_WHEN_NOT_AUTHENTICATED = "/acesso";
@@ -40,14 +39,22 @@ export const isValidToken = async (): Promise<boolean> => {
 };
 
 export async function middleware(req: NextRequest) {
-  const path = req.nextUrl.pathname;
-  const publicRoute = publicRoutes.find((x) => x.path === path);
+  const segments = req.nextUrl.pathname.split("/").filter(Boolean);
+  const tenant = segments[0];
+  const subPath = "/" + segments.slice(1).join("/");
+
+  const publicRoute = publicRoutes.find(
+    (x) => x.path === subPath || subPath === ""
+  );
   const isAuthenticated = await isValidToken();
 
   if (!isAuthenticated && publicRoute) return NextResponse.next();
 
   if (!isAuthenticated && !publicRoute) {
-    const redirectUrl = new URL(REDIRECT_TO_WHEN_NOT_AUTHENTICATED, req.url);
+    const redirectUrl = new URL(
+      `/${tenant}${REDIRECT_TO_WHEN_NOT_AUTHENTICATED}`,
+      req.url
+    );
     redirectUrl.searchParams.set(
       "redirectTo",
       req.nextUrl.pathname + req.nextUrl.search
@@ -59,13 +66,11 @@ export async function middleware(req: NextRequest) {
 
   if (isAuthenticated && publicRoute?.whenAuthenticated === "redirect") {
     const url = req.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = `/${tenant}/`;
     return NextResponse.redirect(url);
   }
 
-  if (isAuthenticated && !publicRoute) {
-    return NextResponse.next();
-  }
+  return NextResponse.next();
 }
 
 export const config: MiddlewareConfig = {

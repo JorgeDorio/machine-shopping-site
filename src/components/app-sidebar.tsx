@@ -1,17 +1,6 @@
-import {
-  Calendar,
-  Home,
-  Inbox,
-  LogIn,
-  LogOut,
-  Megaphone,
-  MessagesSquare,
-  Search,
-  Settings,
-  Star,
-  Tractor,
-  User,
-} from "lucide-react";
+"use client";
+
+import { Megaphone, LogOut } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -25,42 +14,28 @@ import {
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "./theme-changer";
 import Cookies from "js-cookie";
+import { usePathname } from "next/navigation";
 
 const items = [
   {
-    title: "Início",
-    url: "#",
-    icon: Home,
-  },
-  {
-    title: "Catálogo",
-    url: "#",
-    icon: Tractor,
-  },
-  {
-    title: "Favoritos",
-    url: "#",
-    icon: Star,
-  },
-  {
-    title: "Meus Dados",
-    url: "#",
-    icon: User,
-  },
-  {
-    title: "Anunciar",
-    url: "anunciar",
+    title: "Clientes",
+    url: "clientes",
     icon: Megaphone,
   },
   {
-    title: "Contato",
-    url: "#",
-    icon: MessagesSquare,
+    title: "Sair",
+    url: "acesso",
+    icon: LogOut,
   },
 ];
 
 export function AppSidebar() {
   const token = Cookies.get("token");
+  const pathname = usePathname();
+
+  // Extrai o tenant do pathname (ex: /empresa123/anunciar)
+  const segments = pathname.split("/").filter(Boolean);
+  const tenant = segments[0] || "";
 
   return (
     <Sidebar>
@@ -72,35 +47,13 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url}>
+                    <a href={`/${tenant}/${item.url}`}>
                       <item.icon />
                       <span>{item.title}</span>
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              {!token ? (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <a href="acesso">
-                      <LogIn />
-                      <span>Acessar / Cadastrar</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ) : (
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    asChild
-                    onClick={() => Cookies.remove("token")}
-                  >
-                    <a href="/">
-                      <LogOut />
-                      <span>Sair</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

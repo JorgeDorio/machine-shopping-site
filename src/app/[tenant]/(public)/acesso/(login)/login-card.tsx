@@ -1,8 +1,5 @@
 "use client";
-import React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+
 import {
   Form,
   FormControl,
@@ -11,14 +8,30 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { LoginFormValues, loginSchema } from "./login-schema";
 import { useMutation } from "@tanstack/react-query";
 import { loginUser } from "@/services/user-service";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function Login() {
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+interface ILoginCardProps {
+  onTabChange: (value: string) => void;
+}
+
+export function LoginCard({ onTabChange }: ILoginCardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -40,9 +53,14 @@ export default function Login() {
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="p-8 rounded shadow-md w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center">Acesso</h1>
+    <Card>
+      <CardHeader>
+        <CardTitle>Acesso</CardTitle>
+        <CardDescription>
+          Acesse o sistema utilizando seu E-mail e senha.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-2">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit((data) => login.mutate(data))}
@@ -74,15 +92,19 @@ export default function Login() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
-              Entrar
-            </Button>
-            <div className="flex justify-center">
-              <a href="/cadastro">Não tem uma conta? Clique aqui</a>
-            </div>
           </form>
         </Form>
-      </div>
-    </div>
+      </CardContent>
+      <CardFooter className="flex flex-col gap-2">
+        <Button type="submit" className="w-full">
+          Entrar
+        </Button>
+        <div className="flex justify-center cursor-pointer">
+          <a onClick={() => onTabChange("register")}>
+            Não tem uma conta? Clique aqui
+          </a>
+        </div>
+      </CardFooter>
+    </Card>
   );
 }
