@@ -12,7 +12,7 @@ import { LoginFormValues, loginSchema } from "./login-schema";
 import { useMutation } from "@tanstack/react-query";
 import { loginUser } from "@/services/user-service";
 import { toast } from "sonner";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,7 +20,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -34,6 +33,10 @@ interface ILoginCardProps {
 export function LoginCard({ onTabChange }: ILoginCardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+
+  const segments = pathname.split("/").filter(Boolean);
+  const tenant = segments[0] || "";
 
   const login = useMutation({
     mutationFn: loginUser,
@@ -63,7 +66,9 @@ export function LoginCard({ onTabChange }: ILoginCardProps) {
       <CardContent className="space-y-2">
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit((data) => login.mutate(data))}
+            onSubmit={form.handleSubmit((user) =>
+              login.mutate({ user, tenant })
+            )}
             className="space-y-4"
           >
             <FormField
@@ -92,19 +97,17 @@ export function LoginCard({ onTabChange }: ILoginCardProps) {
                 </FormItem>
               )}
             />
+            <Button type="submit" className="w-full">
+              Entrar
+            </Button>
+            <div className="flex justify-center cursor-pointer">
+              <a onClick={() => onTabChange("register")}>
+                Não tem uma conta? Clique aqui
+              </a>
+            </div>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex flex-col gap-2">
-        <Button type="submit" className="w-full">
-          Entrar
-        </Button>
-        <div className="flex justify-center cursor-pointer">
-          <a onClick={() => onTabChange("register")}>
-            Não tem uma conta? Clique aqui
-          </a>
-        </div>
-      </CardFooter>
     </Card>
   );
 }

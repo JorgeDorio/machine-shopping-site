@@ -9,9 +9,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useMutation } from "@tanstack/react-query";
-import { createUser, loginUser } from "@/services/user-service";
+import { createUser } from "@/services/user-service";
 import { toast } from "sonner";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,11 +33,19 @@ interface IRegisterCardProps {
 
 export function RegisterCard({ onTabChange }: IRegisterCardProps) {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const segments = pathname.split("/").filter(Boolean);
+  const tenant = segments[0] || "";
+
   const create = useMutation({
     mutationFn: createUser,
     onSuccess: () => {
       toast("Usuário cadastrado com sucesso");
       router.push("/");
+    },
+    onError: () => {
+      toast("Erro ao cadastrar usuário");
     },
   });
 
@@ -62,7 +70,9 @@ export function RegisterCard({ onTabChange }: IRegisterCardProps) {
       <CardContent className="space-y-2">
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit((user) => create.mutate(user))}
+            onSubmit={form.handleSubmit((user) =>
+              create.mutate({ user, tenant })
+            )}
             className="space-y-4"
           >
             <FormField
@@ -117,19 +127,17 @@ export function RegisterCard({ onTabChange }: IRegisterCardProps) {
                 </FormItem>
               )}
             />
+            <Button type="submit" className="w-full">
+              Cadastrar
+            </Button>
+            <div className="flex justify-center cursor-pointer">
+              <a onClick={() => onTabChange("login")}>
+                Já tem uma conta? Clique aqui
+              </a>
+            </div>
           </form>
         </Form>
       </CardContent>
-      <CardFooter className="flex flex-col gap-2">
-        <Button type="submit" className="w-full">
-          Cadastrar
-        </Button>
-        <div className="flex justify-center cursor-pointer">
-          <a onClick={() => onTabChange("login")}>
-            Já tem uma conta? Clique aqui
-          </a>
-        </div>
-      </CardFooter>
     </Card>
   );
 }

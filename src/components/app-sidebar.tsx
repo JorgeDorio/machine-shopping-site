@@ -30,10 +30,8 @@ const items = [
 ];
 
 export function AppSidebar() {
-  const token = Cookies.get("token");
   const pathname = usePathname();
 
-  // Extrai o tenant do pathname (ex: /empresa123/anunciar)
   const segments = pathname.split("/").filter(Boolean);
   const tenant = segments[0] || "";
 
