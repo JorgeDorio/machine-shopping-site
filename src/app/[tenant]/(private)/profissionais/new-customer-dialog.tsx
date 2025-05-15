@@ -26,16 +26,16 @@ import {
 } from "./new-customer-schema";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createCustomer } from "@/services/useCustomerService";
 
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useTenant } from "@/hooks/useTenant";
-import { useCustomerService } from "@/services/useCustomerService";
 
 export function NewCustomerDialog() {
   const tenant = useTenant();
   const queryClient = useQueryClient();
-  const { createCustomer } = useCustomerService();
+
   const [open, setOpen] = useState(false);
 
   const form = useForm<NewCustomerFormValues>({

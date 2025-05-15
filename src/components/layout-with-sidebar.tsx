@@ -1,8 +1,9 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
+import { usePathname } from "next/navigation";
 
 const hiddenRoutes = ["/acesso", "/cadastro"];
 
@@ -22,7 +23,7 @@ export function LayoutWithSidebar({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main>
+      <main className="w-full">
         <SidebarTrigger />
         {children}
       </main>

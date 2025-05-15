@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/form";
 import { LoginFormValues, loginSchema } from "./login-schema";
 import { useMutation } from "@tanstack/react-query";
-import { loginUser } from "@/services/user-service";
 import { toast } from "sonner";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -25,25 +24,26 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useTenant } from "@/hooks/useTenant";
+import { useUserService } from "@/services/useUserService";
 
 interface ILoginCardProps {
   onTabChange: (value: string) => void;
 }
 
 export function LoginCard({ onTabChange }: ILoginCardProps) {
+  const { loginUser } = useUserService();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const pathname = usePathname();
 
-  const segments = pathname.split("/").filter(Boolean);
-  const tenant = segments[0] || "";
+  const tenant = useTenant();
 
   const login = useMutation({
     mutationFn: loginUser,
     onSuccess: () => {
       toast("Usuário autenticado com sucesso");
       const redirectTo = searchParams.get("redirectTo") || "/";
-      router.push(redirectTo || "/");
+      router.push(redirectTo || `/${tenant}/`);
     },
   });
 

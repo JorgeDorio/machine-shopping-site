@@ -9,9 +9,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useMutation } from "@tanstack/react-query";
-import { createUser } from "@/services/user-service";
 import { toast } from "sonner";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,24 +18,24 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RegisterFormValues, registerSchema } from "./register-schema";
+import { useTenant } from "@/hooks/useTenant";
+import { useUserService } from "@/services/useUserService";
 
 interface IRegisterCardProps {
   onTabChange: (value: string) => void;
 }
 
 export function RegisterCard({ onTabChange }: IRegisterCardProps) {
+  const { createUser } = useUserService();
   const router = useRouter();
-  const pathname = usePathname();
 
-  const segments = pathname.split("/").filter(Boolean);
-  const tenant = segments[0] || "";
+  const tenant = useTenant();
 
   const create = useMutation({
     mutationFn: createUser,

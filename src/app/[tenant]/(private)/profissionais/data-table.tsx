@@ -15,13 +15,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getCustomers } from "@/services/useCustomerService";
 import { useQuery } from "@tanstack/react-query";
 import { useTenant } from "@/hooks/useTenant";
 import { columns } from "./columns";
-import { useCustomerService } from "@/services/useCustomerService";
 
 export function DataTable() {
-  const { getCustomers } = useCustomerService();
   const tenant = useTenant();
   const { data = [] } = useQuery({
     queryKey: ["customers", tenant],

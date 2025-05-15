@@ -1,6 +1,6 @@
 "use client";
 
-import { Megaphone, LogOut } from "lucide-react";
+import { LogOut, BriefcaseBusiness, SquareUser } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -13,27 +13,23 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "./theme-changer";
-import Cookies from "js-cookie";
-import { usePathname } from "next/navigation";
+import { useTenant } from "@/hooks/useTenant";
 
 const items = [
   {
     title: "Clientes",
     url: "clientes",
-    icon: Megaphone,
+    icon: SquareUser,
   },
   {
-    title: "Sair",
-    url: "acesso",
-    icon: LogOut,
+    title: "Profissionais",
+    url: "profissionais",
+    icon: BriefcaseBusiness,
   },
 ];
 
 export function AppSidebar() {
-  const pathname = usePathname();
-
-  const segments = pathname.split("/").filter(Boolean);
-  const tenant = segments[0] || "";
+  const tenant = useTenant();
 
   return (
     <Sidebar>
@@ -52,6 +48,20 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a
+                    href={`/${tenant}/acesso`}
+                    onClick={() =>
+                      (document.cookie =
+                        "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;")
+                    }
+                  >
+                    <LogOut />
+                    <span>Sair</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
